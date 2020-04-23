@@ -99,38 +99,51 @@ func ManifestGroupFromAkash(m *manifest.Group) ManifestGroup {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// LeaseID stores deployment, group sequence, order, provider and metadata
+// LeaseID stores deployment, Group Sequence, Order Sequence, Provider Sequence, and metadata
 type LeaseID struct {
 	metav1.TypeMeta `json:",inline"`
-	// deployment address
+
+	// Deployment Address
+	// TODO: customtype field, marshall to access data? `Owner` specified in deployment bytes?
 	Deployment []byte `protobuf:"bytes,1,opt,name=deployment,proto3,customtype=github.com/ovrclk/akash/types/base.Bytes" json:"deployment"`
-	// deployment group sequence
+
+	// Deployment Sequence Number
+	DeploymentSequence uint64 `protobuf:"varint,5,opt,name=deploymentsequence,proto3" json:"deploymentsequence,omitempty"`
+
+	// Group Sequence Number not specified
 	Group uint64 `protobuf:"varint,2,opt,name=group,proto3" json:"group,omitempty"`
-	// order sequence
+
+	// Order Sequence Number
 	Order uint64 `protobuf:"varint,3,opt,name=order,proto3" json:"order,omitempty"`
-	// provider address
+
+	// Provider account address
 	Provider []byte `protobuf:"bytes,4,opt,name=provider,proto3,customtype=github.com/ovrclk/akash/types/base.Bytes" json:"provider"`
+
+	// Owner account address
+	Owner []byte `protobuf:"bytes,6,opt,name=owner,proto3,customtype=github.com/ovrclk/akash/types/base.Bytes" json:"owner"`
 }
 
 // ToAkash returns LeaseID from LeaseID details
 func (id LeaseID) ToAkash() mtypes.LeaseID {
 	return mtypes.LeaseID{
-		// TODO
-		// Deployment: id.Deployment,
-		// Group:      id.Group,
-		// Order:      id.Order,
-		// Provider:   id.Provider,
+		// TODO: Deployment???
+		Owner:    id.Owner,
+		DSeq:     id.DeploymentSequence,
+		GSeq:     uint32(id.Group), // Original values are uin32
+		OSeq:     uint32(id.Order),
+		Provider: id.Provider,
 	}
 }
 
 // LeaseIDFromAkash returns LeaseID instance from akash
 func LeaseIDFromAkash(id mtypes.LeaseID) LeaseID {
 	return LeaseID{
-		// TODO
-		// Deployment: id.Deployment,
-		// Group:      id.Group,
-		// Order:      id.Order,
-		// Provider:   id.Provider,
+		// TODO: Deployment: id.Deployment ?
+		Owner:              id.Owner,
+		DeploymentSequence: id.DSeq,
+		Group:              uint64(id.GSeq),
+		Order:              uint64(id.OSeq),
+		Provider:           id.Provider,
 	}
 }
 
